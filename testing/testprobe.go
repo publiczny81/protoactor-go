@@ -137,25 +137,20 @@ func (p *testProbe) AsProps() *actor.Props {
 		}
 	})
 }
-//
-//func (p *testProbe) AsService() (service *actor.Props, request chan interface{}, response chan interface{}) {
-//	request = make(chan interface{}, 2)
-//	response = make(chan interface{}, 2)
-//	return actor.PropsFromFunc(func(c actor.Context) {
-//		switch msg := c.Message().(type) {
-//		case actor.SystemMessage:
-//		case actor.AutoReceiveMessage:
-//		default:
-//			p.message <- msg
-//			select {
-//			case input := <-request:
-//				if reflect.DeepEqual(input, msg) {
-//					c.Respond(<-response)
-//				}
-//			}
-//		}
-//	}), request, response
-//}
+
+/*
+Sends a message to actor
+*/
+func (a *testProbe) Send(pid *actor.PID, message interface{}) {
+	a.system.Root.Send(pid, message)
+}
+
+/*
+Sends a request to actor
+*/
+func (a *testProbe) Request(pid *actor.PID, message interface{}) {
+	a.system.Root.RequestWithCustomSender(pid, message, a.pid)
+}
 
 /*
 Verifies if all expected user defined messages have been received. The order of messages is not checked
